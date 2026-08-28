@@ -1,0 +1,90 @@
+<Window x:Class="Mdv.Windows.App.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:converters="clr-namespace:Mdv.Windows.App.Converters"
+        mc:Ignorable="d"
+        Title="mdv-windows"
+        Height="900"
+        Width="1400"
+        MinHeight="600"
+        MinWidth="900"
+        AllowDrop="True"
+        Drop="Window_Drop"
+        DragOver="Window_DragOver"
+        PreviewKeyDown="Window_PreviewKeyDown">
+    <Window.Resources>
+        <converters:TocIndentConverter x:Key="TocIndentConverter" />
+    </Window.Resources>
+
+    <DockPanel>
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="_File">
+                <MenuItem Header="_Open..." Click="OpenMenuItem_Click" InputGestureText="Ctrl+O" />
+                <Separator />
+                <MenuItem Header="_Associate .md files" Click="AssociateMenuItem_Click" />
+                <Separator />
+                <MenuItem Header="E_xit" Click="ExitMenuItem_Click" />
+            </MenuItem>
+            <MenuItem Header="_Themes">
+                <MenuItem Header="Dark" Click="ThemeMenuItem_Click" Tag="Dark" />
+                <MenuItem Header="Light" Click="ThemeMenuItem_Click" Tag="Light" />
+                <MenuItem Header="Reading" Click="ThemeMenuItem_Click" Tag="Reading" />
+            </MenuItem>
+        </Menu>
+
+        <Border DockPanel.Dock="Top" Padding="8" BorderBrush="#555" BorderThickness="0,0,0,1">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="300" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <TextBlock VerticalAlignment="Center" Margin="0,0,8,0" Text="Find:" />
+                <TextBox x:Name="SearchTextBox" Grid.Column="1" VerticalAlignment="Center" Margin="0,0,8,0" TextChanged="SearchTextBox_TextChanged" />
+                <Button Grid.Column="2" Content="Previous" Margin="0,0,8,0" Click="SearchPreviousButton_Click" />
+                <Button Grid.Column="3" Content="Next" Click="SearchNextButton_Click" />
+                <TextBlock Grid.Column="4" Margin="12,0,0,0" VerticalAlignment="Center" Text="{Binding StatusText}" TextTrimming="CharacterEllipsis" />
+            </Grid>
+        </Border>
+
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="280" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="300" />
+            </Grid.ColumnDefinitions>
+
+            <Expander Grid.Column="0" Header="History" IsExpanded="True" BorderBrush="#555" BorderThickness="0,0,1,0">
+                <ListBox x:Name="HistoryListBox"
+                         ItemsSource="{Binding RecentFiles}"
+                         DisplayMemberPath="Path"
+                         MouseDoubleClick="HistoryListBox_MouseDoubleClick"
+                         KeyDown="HistoryListBox_KeyDown">
+                    <ListBox.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="Delete from history" Click="DeleteHistoryMenuItem_Click" />
+                        </ContextMenu>
+                    </ListBox.ContextMenu>
+                </ListBox>
+            </Expander>
+
+            <WebBrowser x:Name="DocumentBrowser" Grid.Column="1" LoadCompleted="DocumentBrowser_LoadCompleted" />
+
+            <Expander Grid.Column="2" Header="Table of Contents" IsExpanded="True" BorderBrush="#555" BorderThickness="1,0,0,0">
+                <ListBox x:Name="TocListBox" ItemsSource="{Binding TocItems}" MouseDoubleClick="TocListBox_MouseDoubleClick">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Title}"
+                                       Margin="{Binding Level, Converter={StaticResource TocIndentConverter}}"
+                                       TextTrimming="CharacterEllipsis" />
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </Expander>
+        </Grid>
+    </DockPanel>
+</Window>
